@@ -22,9 +22,17 @@ return Application::configure(basePath: dirname(__DIR__))
             'sidebar_collapsed',
         ]);
 
+        /**
+         * The admin path is configurable, so these exemptions have to follow it. Hard
+         * coding "admin/" left the inbound parse webhook and the web form endpoint
+         * behind CSRF on any installation that sets APP_ADMIN_PATH, where they answer
+         * 419 instead of working.
+         */
+        $adminPath = trim(env('APP_ADMIN_PATH', 'admin'), '/');
+
         $middleware->validateCsrfTokens(except: [
-            'admin/mail/inbound-parse',
-            'admin/web-forms/forms/*',
+            $adminPath.'/mail/inbound-parse',
+            $adminPath.'/web-forms/forms/*',
         ]);
 
         $middleware->api(prepend: [
