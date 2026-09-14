@@ -4,29 +4,27 @@ namespace Webkul\Admin\DataGrids\Contact;
 
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
-use Webkul\Contact\Repositories\PersonRepository;
 use Webkul\DataGrid\DataGrid;
 
 class OrganizationDataGrid extends DataGrid
 {
     /**
-     * Create datagrid instance.
-     *
-     * @return void
-     */
-    public function __construct(protected PersonRepository $personRepository) {}
-
-    /**
      * Prepare query builder.
      */
     public function prepareQueryBuilder(): Builder
     {
-        return DB::table('organizations')
+        $queryBuilder = DB::table('organizations')
             ->addSelect(
                 'organizations.id',
                 'organizations.name',
                 'organizations.address',
                 'organizations.created_at'
+            )
+            ->selectSub(
+                DB::table('persons')
+                    ->selectRaw('count(*)')
+                    ->whereColumn('persons.organization_id', 'organizations.id'),
+                'persons_count'
             );
 
         if ($userIds = bouncer()->getAuthorizedUserIds()) {
@@ -36,6 +34,8 @@ class OrganizationDataGrid extends DataGrid
         $this->addFilter('id', 'organizations.id');
 
         $this->addFilter('organization', 'organizations.name');
+
+        return $queryBuilder;
     }
 
     /**
@@ -67,11 +67,6 @@ class OrganizationDataGrid extends DataGrid
             'searchable' => false,
             'sortable' => false,
             'filterable' => false,
-            'closure' => function ($row) {
-                $personsCount = $this->personRepository->findWhere(['organization_id' => $row->id])->count();
-
-                return $personsCount;
-            },
         ]);
 
         $this->addColumn([

@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Webkul\DataGrid\DataGrid;
-use Webkul\Email\Repositories\EmailRepository;
 use Webkul\Tag\Repositories\TagRepository;
 
 class EmailDataGrid extends DataGrid
@@ -17,6 +16,11 @@ class EmailDataGrid extends DataGrid
      * @var ?string
      */
     protected $sortColumn = 'created_at';
+
+    /**
+     * Tags of the current page's emails, keyed by email id.
+     */
+    protected array $emailTags = [];
 
     /**
      * Prepare query builder.
@@ -48,6 +52,22 @@ class EmailDataGrid extends DataGrid
         $this->addFilter('created_at', 'emails.created_at');
 
         return $queryBuilder;
+    }
+
+    /**
+     * Batch-load the tags for the whole page before the per-row closures run,
+     * so the `tags` column does not query the database once per row.
+     */
+    protected function formatRecords($records): mixed
+    {
+        $this->emailTags = DB::table('email_tags')
+            ->join('tags', 'tags.id', '=', 'email_tags.tag_id')
+            ->whereIn('email_tags.email_id', collect($records)->pluck('id')->all())
+            ->get(['email_tags.email_id', 'tags.name', 'tags.color'])
+            ->groupBy('email_id')
+            ->toArray();
+
+        return parent::formatRecords($records);
     }
 
     /**
@@ -105,13 +125,7 @@ class EmailDataGrid extends DataGrid
             'sortable' => true,
             'filterable' => true,
             'filterable_type' => 'searchable_dropdown',
-            'closure' => function ($row) {
-                if ($email = app(EmailRepository::class)->find($row->id)) {
-                    return $email->tags;
-                }
-
-                return '--';
-            },
+            'closure' => fn ($row) => $this->emailTags[$row->id] ?? [],
             'filterable_options' => [
                 'repository' => TagRepository::class,
                 'column' => [
