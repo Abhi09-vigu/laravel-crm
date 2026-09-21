@@ -22,7 +22,10 @@ Route::prefix('mail')->middleware('sanitize_url')->group(function () {
 
         Route::post('mass-destroy', 'massDestroy')->name('admin.mail.mass_delete');
 
-        Route::post('inbound-parse', 'inboundParse')->name('admin.mail.inbound_parse')->withoutMiddleware('user');
+        Route::post('inbound-parse', 'inboundParse')
+            ->name('admin.mail.inbound_parse')
+            ->withoutMiddleware('user')
+            ->middleware(['throttle:60,1', 'inbound_email_token']);
     });
 
     Route::controller(TagController::class)->prefix('{id}/tags')->group(function () {
