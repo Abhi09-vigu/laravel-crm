@@ -1,0 +1,25 @@
+{
+    "name": "krayin/laravel-real-estate",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Webkul",
+            "email": "sales@webkul.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Webkul\\RealEstate\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Webkul\\RealEstate\\Providers\\RealEstateServiceProvider"
+            ],
+            "aliases": {}
+        }
+    },
+    "minimum-stability": "dev"
+}

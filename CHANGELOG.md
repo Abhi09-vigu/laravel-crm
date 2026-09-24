@@ -4,6 +4,10 @@ This changelog consists of the bug & security fixes and new features being inclu
 
 ## **v2.2.6 (10th of Sept 2026)**
 
+* [feature] Added Real Estate Project Management module supporting project creation, details overview, inventory summary, filtering, search, and status lifecycle management.
+
+* [fixed] Fixed breadcrumbs registration for Real Estate Project Management routes in routes/breadcrumbs.php.
+
 * [feature] Added MariaDB support.
 
 * [feature] Added customizable lead card information. Datagrid columns and Kanban lead card fields can now be chosen per user through new column and card settings components.

@@ -462,3 +462,27 @@ Breadcrumbs::for('dashboard.account.edit', function (BreadcrumbTrail $trail, $us
     $trail->parent('dashboard');
     $trail->push(trans('admin::app.account.edit.title'), route('admin.user.account.edit', $user->id));
 });
+
+// Real Estate > Projects
+Breadcrumbs::for('real_estate.projects', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push(trans('real_estate::app.projects.index.title'), route('admin.real_estate.projects.index'));
+});
+
+// Real Estate > Projects > Create
+Breadcrumbs::for('real_estate.projects.create', function (BreadcrumbTrail $trail) {
+    $trail->parent('real_estate.projects');
+    $trail->push(trans('real_estate::app.projects.create.title'), route('admin.real_estate.projects.create'));
+});
+
+// Real Estate > Projects > View
+Breadcrumbs::for('real_estate.projects.view', function (BreadcrumbTrail $trail, $project) {
+    $trail->parent('real_estate.projects');
+    $trail->push($project->project_name ?? trans('real_estate::app.projects.view.title'), route('admin.real_estate.projects.view', $project->id ?? $project));
+});
+
+// Real Estate > Projects > Edit
+Breadcrumbs::for('real_estate.projects.edit', function (BreadcrumbTrail $trail, $project) {
+    $trail->parent('real_estate.projects');
+    $trail->push(trans('real_estate::app.projects.edit.title'), route('admin.real_estate.projects.edit', $project->id ?? $project));
+});
